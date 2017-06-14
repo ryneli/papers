@@ -1,0 +1,46 @@
+#+TITLE: SyncPerf
+* Motivation
+Multithreaded programming is hard. Performance is essential problem, especially when related to synchronization issues. Current works only focus on the frequently used lock with high contention. Neither of them tries to do a fine-grained category and trace the root cause of lock contention. Never to say to provide an effective solution.
+
+So the main contribution of this paper is:
+- providing detailed category of synchronization problems in two deminsions, frequency of lock acquisitions and contention rate.
+- provide a table of lots of different synchronization problems and their corresponding solutions.
+
+* Techniques
+- work on pthread with LOAD_LIBRARY
+
+
+[[./syncperf-1.png]]
+
+[[./syncperf-2.png]]
+
+** Improper primitives
+This is very detail and useful guideline for the characteristics of synchronization primitives.
+- atomic instructions for simple integer operations
+- spin lock, less overhead when the time cost in critical sections is very short
+- mutex lock, when critical sections contain waiting operations
+
+** Improper Granularity
+- one lock for many objects
+- one lock for many instructions
+- many locks in the same function/critical section
+
+** Over-synchronization
+- no lock needed for local variables/atomics
+- double locked
+
+** Asymmetric contention
+- different contention rate of the buckets in one hash table
+
+** Load Imbalance
+- Threads contention rate is significantly different
+
+** Collected data
+- thread start time and end time, time for waiting synchronization
+- lock acquired times, contended times, thread waiting time for a lock
+- try-lock called times and failed times because of contention
+- back trace for every lock
+
+* Weakness and future work
+- back trace overhead in general case, (without frame pointer)
+- only works for pthread
